@@ -17,4 +17,6 @@ You can select the different metrics and years to see top 10 and bottom 10 count
 
 You can also select the specific data only, without the visualizations at http://127.0.0.1:8000/data?year=2020 by specifying the year at the end each time.
 
+![Screenshot 2025-05-08 at 00-27-48 ](https://github.com/user-attachments/assets/7788d13c-d147-4a58-aeba-e16bf74df466)
+
 Selecting http://127.0.0.1:8000/data goes by default to 2024 but data is still incomplete and mostly null for that year.
