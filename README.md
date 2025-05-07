@@ -1,7 +1,12 @@
 # AAK_data_test
 
-To access the project type in a terminal in the same folder as main.py the file "uvicorn main:app --reload"
-You will get a message  saying application startup is complete.
+## **Overview of the project**
+This project uses FastApi to scrape data related to countries from  the official world bank API "http://api.worldbank.org/v2". Then the data is parsed through and html.index file and visualizations of certain metrics are created.
+
+## **How to access**
+
+You need to pip install fastpi , httpx, asyncio , or any other missing package in a terminal before cloning the repo. After cloning the repository to your local device, to access the project type in a terminal in the same folder as the main.py file "uvicorn main:app --reload".
+You will get a message saying application startup is complete at the end if all runs smoothly.
 
 
 After that you can visit http://127.0.0.1:8000 to see the main dashboard, which plots the data.
