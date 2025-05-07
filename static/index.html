@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>World Metrics Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation"></script>
+  <style>
+    /* Style for the labels (Top 10 / Bottom 10) */
+    .chart-header {
+      text-align: center;
+      font-size: 18px;
+      font-weight: bold;
+      flex: 1; /* Allow both labels to take equal width */
+      margin: 10px;
+    }
+
+    /* Flex container for the entire chart section */
+    .chart-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* Row containing both chart titles and the charts */
+    .chart-row {
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+      max-width: 1000px;
+      margin-top: 20px;
+    }
+
+    /* Container for each chart */
+    .chart-wrapper {
+      width: 45%;
+    }
+
+    /* Flexbox for top and bottom labels */
+    .label-container {
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+      max-width: 1000px;
+      margin-bottom: 10px;
+    }
+
+    /* Style for the individual labels */
+    .label-container .chart-header {
+      flex: 1;
+      text-align: center;
+      margin: 0 10px;
+    }
+  </style>
+</head>
+<body>
+  <h1>World Metrics Dashboard</h1>
+
+  <label for="year">Select Year:</label>
+  <input type="number" id="year" value="2024" min="2000" max="2024">
+
+  <label for="metric">Select Metric:</label>
+  <select id="metric">
+    <option value="GDP">GDP</option>
+    <option value="Population">Population</option>
+    <option value="Life Expectancy">Life Expectancy</option>
+    <option value="Inflation">Inflation</option>
+    <option value="Net Migration">Net Migration</option>
+    <option value="Internet Users (% of population)">Internet Users (% of population)</option>
+    <option value="GDP Growth (%)">GDP Growth (%)</option>
+  </select>
+
+  <button onclick="loadData()">Load Data</button>
+
+  <div class="chart-container">
+    <!-- Labels Container: Top 10 / Bottom 10 -->
+    <div class="label-container">
+      <div class="chart-header" id="top-header">Top 10 Countries</div>
+      <div class="chart-header" id="bottom-header">Bottom 10 Countries</div>
+    </div>
+    <!-- Row for Top 10 and Bottom 10 Charts -->
+    <div class="chart-row">
+      <div class="chart-wrapper">
+        <canvas id="topChart" width="400" height="300"></canvas>
+      </div>
+      <div class="chart-wrapper">
+        <canvas id="bottomChart" width="400" height="300"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let topChart, bottomChart;
+
+    async function loadData() {
+      const year = document.getElementById('year').value;
+      const metric = document.getElementById('metric').value;
+      const res = await fetch(`/data?year=${year}`);
+      const data = await res.json();
+
+      const validData = data.filter(d => typeof d[metric] === "number");
+
+      // Top 10 (highest values)
+      const top10 = validData.slice().sort((a, b) => b[metric] - a[metric]).slice(0, 10);
+      // Bottom 10 (lowest values)
+      const bottom10 = validData.slice().sort((a, b) => a[metric] - b[metric]).slice(0, 10);
+
+      // Top 10 chart data
+      const topLabels = top10.map(d => d.country);
+      const topValues = top10.map(d => d[metric]);
+
+      // Bottom 10 chart data
+      const bottomLabels = bottom10.map(d => d.country);
+      const bottomValues = bottom10.map(d => d[metric]);
+
+      const topCtx = document.getElementById('topChart').getContext('2d');
+      const bottomCtx = document.getElementById('bottomChart').getContext('2d');
+
+      // Destroy existing charts if any
+      if (topChart) topChart.destroy();
+      if (bottomChart) bottomChart.destroy();
+
+      // Create Top 10 Chart
+      topChart = new Chart(topCtx, {
+        type: 'bar',
+        data: {
+          labels: topLabels,
+          datasets: [{
+            label: `${metric} in ${year}`,
+            data: topValues,
+            backgroundColor: 'rgba(75, 192, 192, 0.6)'
+          }]
+        },
+        options: {
+          responsive: true,
+          scales: {
+            y: {
+              beginAtZero: true
+            }
+          }
+        }
+      });
+
+      // Create Bottom 10 Chart
+      bottomChart = new Chart(bottomCtx, {
+        type: 'bar',
+        data: {
+          labels: bottomLabels,
+          datasets: [{
+            label: `${metric} in ${year}`,
+            data: bottomValues,
+            backgroundColor: 'rgba(255, 99, 132, 0.6)'
+          }]
+        },
+        options: {
+          responsive: true,
+          scales: {
+            y: {
+              beginAtZero: true
+            }
+          }
+        }
+      });
+    }
+  </script>
+</body>
+</html>
